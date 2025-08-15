@@ -1,35 +1,84 @@
 #pragma once
 #include <Arduino.h>
 
-// === Pinos dos sensores ===
+//Pinos dos sensores
 #define SENSOR_ESQ_PIN 18
 #define SENSOR_CEN_PIN 9
 #define SENSOR_DIR_PIN 8
 #define LED_SENSORES_PIN 10
 
-#define ledAmarelo 37
-#define ledVerde 36
-#define ledVermelho 38
-
-#define botao1 47
-
-// === Estados internos ===
+//Estado atual dos sensores
 int stateEsq = 0;
 int stateCen = 0;
 int stateDir = 0;
 
-// === Calibração dinâmica ===
+//Valores de calibracao dos sensores
 int valSensorBrancoEsq = 0;
 int valSensorBrancoCen = 0;
 int valSensorBrancoDir = 0;
 int valSensorPretoEsq = 0;
 int valSensorPretoCen = 0;
 int valSensorPretoDir = 0;
-int offsetEsq = 100;
-int offsetCen = 100;
-int offsetDir = 100;
-int limiarSensor = 0;
-const int valSensorMargem = 100;
+int offsetEsq = 0;
+int offsetCen = 0;
+int offsetDir = 0;
+
+// Função para salvar calibração
+bool salvaCalibracao() {
+    StaticJsonDocument<256> doc;
+
+    doc["preto_esq"]   = valSensorPretoEsq;
+    doc["branco_esq"]  = valSensorBrancoEsq;
+    doc["preto_cen"]   = valSensorPretoCen;
+    doc["branco_cen"]  = valSensorBrancoCen;
+    doc["preto_dir"]   = valSensorPretoDir;
+    doc["branco_dir"]  = valSensorBrancoDir;
+
+    File file = LittleFS.open("/calibracao.json", "w");
+    if (!file) {
+        Serial.println("Erro ao abrir arquivo para escrita");
+        return false;
+    }
+
+    serializeJson(doc, file);
+    file.close();
+    Serial.println("Calibração salva com sucesso!");
+    return true;
+}
+
+// Função para carregar calibração
+bool carregaCalibracao() {
+    if (!LittleFS.exists("/calibracao.json")) {
+        Serial.println("Arquivo de calibração não encontrado.");
+        return false;
+    }
+
+    File file = LittleFS.open("/calibracao.json", "r");
+    if (!file) {
+        Serial.println("Erro ao abrir arquivo para leitura");
+        return false;
+    }
+
+    StaticJsonDocument<256> doc;
+    DeserializationError error = deserializeJson(doc, file);
+    if (error) {
+        Serial.println("Erro ao ler JSON de calibração");
+        file.close();
+        return false;
+    }
+
+    valSensorPretoEsq  = doc["preto_esq"];
+    valSensorBrancoEsq = doc["branco_esq"];
+    valSensorPretoCen  = doc["preto_cen"];
+    valSensorBrancoCen = doc["branco_cen"];
+    valSensorPretoDir  = doc["preto_dir"];
+    valSensorBrancoDir = doc["branco_dir"];
+
+    file.close();
+    Serial.println("Calibração carregada com sucesso!");
+    return true;
+}
+
 
 // === Leitura bruta com cancelamento de luz ambiente ===
 int readRawSensor(int sensorPin, int ledPin) {
@@ -51,19 +100,11 @@ int readRawSensor(int sensorPin, int ledPin) {
 
     return somaLeituras / numLeituras;
 }
-// === Inicialização dos sensores e calibração ===
-void inicializarSensores() {
-    pinMode(SENSOR_ESQ_PIN, INPUT);
-    pinMode(SENSOR_CEN_PIN, INPUT);
-    pinMode(SENSOR_DIR_PIN, INPUT);
-    pinMode(LED_SENSORES_PIN, OUTPUT);
-	pinMode(botao1, INPUT_PULLUP);
-    digitalWrite(LED_SENSORES_PIN, LOW);
 
-    delay(300); // Tempo para estabilizar
-	
-	
-	bool leituraBotao = digitalRead(botao1);
+
+//Faz a calibração dos sensores//
+void calibraSensores(){
+bool leituraBotao = digitalRead(botao1);
 	while(leituraBotao == HIGH){
 		digitalWrite(ledVerde, HIGH);
 		delay(100);
@@ -80,7 +121,7 @@ void inicializarSensores() {
 	valSensorBrancoCen = leituraCen;
 	
 	//valor de leitura dos sensores para o preto
-	valSensorPretoEsq = leituraEsq - offsetEsq;
+	valSensorPretoEsq = leituraEsq;
 	
 	delay(1000);
 	
@@ -102,7 +143,7 @@ void inicializarSensores() {
     valSensorBrancoDir = leituraDir;
 	
 	//valor de leitura dos sensores para o preto
-    valSensorPretoCen = leituraCen - offsetCen;
+    valSensorPretoCen = leituraCen;
 	
 	delay(1000);
 	
@@ -115,20 +156,37 @@ void inicializarSensores() {
 		leituraBotao = digitalRead(botao1);
 	}
 	
-
   leituraEsq = readRawSensor(SENSOR_ESQ_PIN, LED_SENSORES_PIN);
   leituraCen = readRawSensor(SENSOR_CEN_PIN, LED_SENSORES_PIN);
   leituraDir = readRawSensor(SENSOR_DIR_PIN, LED_SENSORES_PIN);
     
-	
 	//Valor de leitura dos sensores para o preto
-    valSensorPretoDir = leituraDir - offsetDir;	
-	delay(1000);
+  valSensorPretoDir = leituraDir;	
+
+}
+
+// === Inicialização dos sensores e calibração ==
+void inicializarSensores() {
+  pinMode(LED_SENSORES_PIN, OUTPUT);
+	pinMode(botao1, INPUT_PULLUP);
+  pinMode(botao2, INPUT_PULLUP);
+  digitalWrite(LED_SENSORES_PIN, LOW);
+  delay(300); // Tempo para estabilizar
+
+  if (!LittleFS.begin(true)) {
+        Serial.println("Falha ao montar LittleFS");
+        return;
+    }
+	
+  if(digitalRead(botao2) == LOW || !carregaCalibracao()){
+    calibraSensores();
+    salvaCalibracao();
+  }
 
   offsetEsq = (valSensorBrancoEsq - valSensorPretoEsq) / 3;
   offsetCen = (valSensorBrancoCen - valSensorPretoCen) / 3;
   offsetDir = (valSensorBrancoDir - valSensorPretoDir) / 3;
-    
+  
   Serial.println("----- VALORES DOS SENSORES -----");
   
   Serial.print("valSensorPretoEsq: ");
@@ -160,12 +218,6 @@ void inicializarSensores() {
   Serial.print("offsetDir: ");
   Serial.println(offsetDir);
 
-    // Feedback opcional
-    /*Serial.println("=== Calibração dos Sensores ===");
-    Serial.print("Branco (avg): "); Serial.println(valSensorBranco);
-    Serial.print("Preto (cen): "); Serial.println(valSensorPreto);
-    Serial.print("Limiar: "); Serial.println(limiarSensor);
-    Serial.println("================================"); */
 }
 
 // === Conversão com zona morta ===

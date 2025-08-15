@@ -1,17 +1,15 @@
+#include "defines.h"
 #include "motor_pid.h"  //Motor A é Direita e Motor B Esquerda
 #include "sensoresIR.h" // Supondo que o nome do seu arquivo .h seja esse
-#define VERMELHO 38
-#define AMARELO  37
-#define VERDE    36
 
 //readSensorEsq() / readSensorDir() / readSensorCen() == lê a linha (0 branco, 1 preto)
 //setVelocidade("DIREÇÃO", VELOCIDADE) == define a velocidade
 
 void setup() {
   Serial.begin(115200);
-  pinMode(VERMELHO, OUTPUT);
-  pinMode(AMARELO, OUTPUT);
-  pinMode(VERDE, OUTPUT);
+  pinMode(ledVermelho, OUTPUT);
+  pinMode(ledAmarelo, OUTPUT);
+  pinMode(ledVerde, OUTPUT);
   delay(100);
   inicializarSensores();
   delay(1000);
@@ -24,9 +22,9 @@ void loop() {
    int cen = readSensorCen();
    int dir = readSensorDir();
 
-    digitalWrite(VERMELHO, dir);
-    digitalWrite(AMARELO, cen);
-    digitalWrite(VERDE, esq);
+    digitalWrite(ledVermelho, dir);
+    digitalWrite(ledAmarelo, cen);
+    digitalWrite(ledVerde, esq);
 
   // // // Aplica lógica de decisão nos motores
    if (esq == 1 && dir == 0) {
@@ -48,6 +46,5 @@ void loop() {
   Serial.print("Esq: "); Serial.print(esq);
   Serial.print(" | Cen: "); Serial.print(cen);
   Serial.print(" | Dir: "); Serial.println(dir);
-  //delay();
 
 }
