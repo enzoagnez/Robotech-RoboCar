@@ -73,7 +73,7 @@ class MotorPID {
     void atualizarControle() {
       if (setpoint_rpm == 0) {
         // Desabilita o motor
-        digitalWrite(STBY, LOW);
+        //digitalWrite(STBY, LOW);
         // Garante que os pinos de direção estejam em estado seguro
         digitalWrite(in1_pin, LOW);
         digitalWrite(in2_pin, LOW);
