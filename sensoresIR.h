@@ -87,11 +87,11 @@ int readRawSensor(int sensorPin, int ledPin) {
 
     for (int i = 0; i < numLeituras; i++) {
         digitalWrite(ledPin, HIGH);
-        delayMicroseconds(200);
+        delay(1);
         int leituraIR = analogRead(sensorPin);
 
         digitalWrite(ledPin, LOW);
-        delayMicroseconds(200);
+        delay(1);
         int leituraAmb = analogRead(sensorPin);
 
         somaLeituras += (leituraAmb - leituraIR); // Ambiente - IR
