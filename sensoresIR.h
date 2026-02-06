@@ -87,11 +87,11 @@ int readRawSensor(int sensorPin, int ledPin) {
 
     for (int i = 0; i < numLeituras; i++) {
         digitalWrite(ledPin, HIGH);
-        delay(1);
+        delayMicroseconds(200);
         int leituraIR = analogRead(sensorPin);
 
         digitalWrite(ledPin, LOW);
-        delay(1);
+        delayMicroseconds(200);
         int leituraAmb = analogRead(sensorPin);
 
         somaLeituras += (leituraAmb - leituraIR); // Ambiente - IR
@@ -168,7 +168,7 @@ bool leituraBotao = digitalRead(botao1);
 // === Inicialização dos sensores e calibração ==
 void inicializarSensores() {
   pinMode(LED_SENSORES_PIN, OUTPUT);
-  pinMode(botao1, INPUT_PULLUP);
+	pinMode(botao1, INPUT_PULLUP);
   pinMode(botao2, INPUT_PULLUP);
   digitalWrite(LED_SENSORES_PIN, LOW);
   delay(300); // Tempo para estabilizar
@@ -233,21 +233,21 @@ int convertToDigital(int rawValue, int* currentState, int valPreto, int valBranc
 // === Leituras digitais ===
 int readSensorEsq() {
     int raw = readRawSensor(SENSOR_ESQ_PIN, LED_SENSORES_PIN);
-    Serial.print("Sensor esquerdo: ");
-    Serial.println(raw);
+    //Serial.print("Sensor esquerdo: ");
+    //Serial.println(raw);
     return convertToDigital(raw, &stateEsq, valSensorPretoEsq, valSensorBrancoEsq, offsetEsq);
 }
 
 int readSensorCen() {
     int raw = readRawSensor(SENSOR_CEN_PIN, LED_SENSORES_PIN);
-    Serial.print("Sensor centro: ");
-    Serial.println(raw);
+    //Serial.print("Sensor centro: ");
+    //Serial.println(raw);
     return convertToDigital(raw, &stateCen, valSensorPretoCen, valSensorBrancoCen, offsetCen);
 }
 
 int readSensorDir() {
     int raw = readRawSensor(SENSOR_DIR_PIN, LED_SENSORES_PIN);
-    Serial.print("Sensor direito: ");
-    Serial.println(raw);
+    //Serial.print("Sensor direito: ");
+    //Serial.println(raw);
     return convertToDigital(raw, &stateDir, valSensorPretoDir, valSensorBrancoDir, offsetDir);
 }
