@@ -168,7 +168,7 @@ bool leituraBotao = digitalRead(botao1);
 // === Inicialização dos sensores e calibração ==
 void inicializarSensores() {
   pinMode(LED_SENSORES_PIN, OUTPUT);
-	pinMode(botao1, INPUT_PULLUP);
+  pinMode(botao1, INPUT_PULLUP);
   pinMode(botao2, INPUT_PULLUP);
   digitalWrite(LED_SENSORES_PIN, LOW);
   delay(300); // Tempo para estabilizar
