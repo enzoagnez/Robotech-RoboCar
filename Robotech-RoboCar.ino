@@ -10,6 +10,7 @@ void setup() {
   pinMode(ledVermelho, OUTPUT);
   pinMode(ledAmarelo, OUTPUT);
   pinMode(ledVerde, OUTPUT);
+  pinMode(buzzer, OUTPUT);
   delay(100);
   inicializarSensores();
   delay(1000);
@@ -51,7 +52,15 @@ void loop() {
     setVelocidade("D", 15);
     setVelocidade("E", 15);
   }
-
+  if(esq == 0 && dir == 0 && cen == 0) {
+    setVelocidade("D", 5);
+    setVelocidade("E", 5);
+    digitalWrite(buzzer, HIGH);
+  }
+  digitalWrite(buzzer, HIGH);
+  delayMicroseconds(6);
+  digitalWrite(buzzer, LOW);
+  delayMicroseconds(1);
  //else //{
   // //   // Situação fora do previsto (ex: os dois sensores fora da linha)
   //    setVelocidade("D", -40);
