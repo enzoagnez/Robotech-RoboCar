@@ -34,14 +34,14 @@ void loop() {
   }
   if(esq == 1 && dir == 0 && cen == 1) {
     setVelocidade("D", 15);
-    setVelocidade("E", -5);
+    setVelocidade("E", 0);
   }
   if(esq == 0 && dir == 1 && cen == 0) {
     setVelocidade("D", -10);
     setVelocidade("E", 10);
   }
   if(esq == 0 && dir == 1 && cen == 1) {
-    setVelocidade("D", -5);
+    setVelocidade("D", 0);
     setVelocidade("E", 15);
   }
   if(esq == 0 && dir == 0 && cen == 1) {
@@ -55,12 +55,8 @@ void loop() {
   if(esq == 0 && dir == 0 && cen == 0) {
     setVelocidade("D", 5);
     setVelocidade("E", 5);
-    digitalWrite(buzzer, HIGH);
   }
-  digitalWrite(buzzer, HIGH);
-  delayMicroseconds(6);
-  digitalWrite(buzzer, LOW);
-  delayMicroseconds(1);
+  
  //else //{
   // //   // Situação fora do previsto (ex: os dois sensores fora da linha)
   //    setVelocidade("D", -40);
