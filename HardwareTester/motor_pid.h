@@ -127,14 +127,14 @@ class MotorPID {
 
       ledcWrite(pwm_pin, pwm);
 
-      // Serial.print("Motor ");
-      // Serial.print(nome);
-      // Serial.print(" | Setpoint: ");
-      // Serial.print(setpoint_rpm);
-      // Serial.print(" RPM | Medido: ");
-      // Serial.print(rpm);
-      // Serial.print(" RPM | PWM: ");
-      // Serial.println(pwm);
+      Serial.print(" Motor ");
+      Serial.print(nome);
+      Serial.print(" | Setpoint: ");
+      Serial.print(setpoint_rpm);
+      Serial.print(" RPM | Medido: ");
+      Serial.print(rpm);
+      Serial.print(" RPM | PWM: ");
+      Serial.println(pwm);
     }
 };
 
